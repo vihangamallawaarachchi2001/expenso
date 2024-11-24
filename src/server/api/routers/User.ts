@@ -99,6 +99,26 @@ export const userRouter = createTRPCRouter({
     }
   }),
 
+  profile: publicProcedure.input(z.object({
+    email: z.string().email(),
+  })).query(async ({ input, ctx }) => {
+    try {
+      const user = await ctx.db.user.findUnique({
+        where: { email: input.email },
+      });
+
+      return {
+        user,
+      };
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to fetch profile in.',
+      });
+    }
+  }),
+
   updateProfile: publicProcedure.input(z.object({
     id: z.string(),
     name: z.string().optional(),
