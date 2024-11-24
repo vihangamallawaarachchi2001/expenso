@@ -74,6 +74,6 @@ model Authtoken {
   user       User     @relation(fields: [userId], references: [id])
   userId     String
   identifier String   @unique
-  token      String
+  token      String   @db.VarChar(255)
   expires    DateTime
 }
