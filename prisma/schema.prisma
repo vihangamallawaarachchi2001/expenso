@@ -21,6 +21,7 @@ model User {
   tokens    Authtoken[] // Add this field for the reverse relation
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  Category  Category[]
 }
 
 model Expense {
@@ -57,6 +58,8 @@ model Category {
   id        String    @id @default(cuid())
   name      String    @unique
   expenses  Expense[]
+  userId    String
+  User      User      @relation(fields: [userId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
