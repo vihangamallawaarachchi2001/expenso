@@ -22,7 +22,6 @@ export const categoryRouter = createTRPCRouter({
         const existingCategory = await ctx.db.category.findFirst({
           where: {
             name: input.name,
-            userId: input.userId,
           },
         });
 
@@ -37,7 +36,6 @@ export const categoryRouter = createTRPCRouter({
         const newCategory = await ctx.db.category.create({
           data: {
             name: input.name,
-            userId: input.userId,
           },
         });
 

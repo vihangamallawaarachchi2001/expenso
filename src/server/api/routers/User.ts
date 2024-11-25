@@ -76,6 +76,16 @@ export const userRouter = createTRPCRouter({
       const tokenPayload = { id: user.id, email: user.email };
       const token = jwt.sign(tokenPayload, process.env.JWT_SECRET!, { expiresIn: '7d' });
 
+      const existingToken = await ctx.db.authtoken.findUnique({
+        where: { userId: user.id, identifier: user.email },
+      });
+
+      if (existingToken) {
+        await ctx.db.authtoken.delete({
+          where: { id: existingToken.id },
+        });
+      }
+
       await ctx.db.authtoken.create({
         data: {
           token,

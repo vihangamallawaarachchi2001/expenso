@@ -56,11 +56,11 @@ export default function ProfileCard({ user }: ProfileProp) {
   return (
     <section className="flex flex-col items-center justify-center p-6 bg-white rounded-lg space-y-6 md:flex-row md:space-x-8">
       {/* Profile Picture */}
-      <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
+      <div className="relative w-96 h-auto rounded-lg overflow-hidden">
         <img
           src="/dog.png"
           alt="User profile picture"
-          className="h-full max-h-[320px] w-auto object-cover"
+          className="h-full  w-auto object-cover"
         />
       </div>
 
