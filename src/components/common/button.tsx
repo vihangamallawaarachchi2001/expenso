@@ -1,5 +1,5 @@
 type ButtonProps = {
-    title: string;
+    title: string | JSX.Element;
     onclick?: () => void;
     classNameBtn?: string;
     classNameIcon?: string;

@@ -9,12 +9,11 @@ export const expenseRouter = createTRPCRouter({
   /**
    * Get all expenses.
    */
-  all: publicProcedure.query(async ({ ctx }) => {
+  all: publicProcedure.input(z.object({
+    userId: z.string(),
+  })).query(async ({ ctx }) => {
     try {
       const expenses = await ctx.db.expense.findMany({
-        include: {
-          category: true, // Include related category details
-        },
       });
       return {
         message: "Expenses fetched successfully.",
@@ -42,7 +41,6 @@ export const expenseRouter = createTRPCRouter({
       try {
         const expense = await ctx.db.expense.findUnique({
           where: { id: input.id },
-          include: { category: true },
         });
 
         if (!expense) {
@@ -75,8 +73,8 @@ export const expenseRouter = createTRPCRouter({
         title: z.string().min(1, "Title is required."),
         description: z.string().optional(),
         amount: z.number().positive("Amount must be a positive number."),
-        userId: z.string().uuid("Invalid user ID format."),
-        categoryId: z.string().uuid("Invalid category ID format."),
+        userId: z.string(),
+        category: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -92,17 +90,6 @@ export const expenseRouter = createTRPCRouter({
           });
         }
 
-        // Check if the category exists
-        const categoryExists = await ctx.db.category.findUnique({
-          where: { id: input.categoryId },
-        });
-        if (!categoryExists) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Category not found.",
-          });
-        }
-
         // Create the expense
         const expense = await ctx.db.expense.create({
           data: {
@@ -110,9 +97,8 @@ export const expenseRouter = createTRPCRouter({
             description: input.description,
             amount: input.amount,
             userId: input.userId,
-            categoryId: input.categoryId,
+            category: input.category,
           },
-          include: { category: true },
         });
 
         return {
@@ -135,11 +121,11 @@ export const expenseRouter = createTRPCRouter({
   edit: publicProcedure
     .input(
       z.object({
-        id: z.string().uuid("Invalid expense ID format."),
+        id: z.string(),
         title: z.string().min(1, "Title is required."),
         description: z.string().optional(),
         amount: z.number().positive("Amount must be a positive number."),
-        categoryId: z.string().uuid("Invalid category ID format."),
+        category: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -155,17 +141,6 @@ export const expenseRouter = createTRPCRouter({
           });
         }
 
-        // Check if the category exists
-        const categoryExists = await ctx.db.category.findUnique({
-          where: { id: input.categoryId },
-        });
-        if (!categoryExists) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Category not found.",
-          });
-        }
-
         // Update the expense
         const updatedExpense = await ctx.db.expense.update({
           where: { id: input.id },
@@ -173,9 +148,8 @@ export const expenseRouter = createTRPCRouter({
             title: input.title,
             description: input.description,
             amount: input.amount,
-            categoryId: input.categoryId,
+            category: input.category,
           },
-          include: { category: true },
         });
 
         return {
@@ -198,7 +172,7 @@ export const expenseRouter = createTRPCRouter({
   remove: publicProcedure
     .input(
       z.object({
-        id: z.string().uuid("Invalid expense ID format."),
+        id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -231,4 +205,46 @@ export const expenseRouter = createTRPCRouter({
         });
       }
     }),
+    getanalytics: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      try {
+        const [expenseCount, incomeCount] = await Promise.all([
+          ctx.db.expense.aggregate({
+            where: {
+              userId: input.userId,
+              category: "income",
+            },
+            _sum: {
+              amount: true,
+            },
+          }),
+          ctx.db.expense.aggregate({
+            where: {
+              userId: input.userId,
+              category: "expense",
+            },
+            _sum: {
+              amount: true,
+            },
+          }),
+        ]);
+  
+        return {
+          expenseCount: expenseCount._sum.amount ?? 0,
+          incomeCount: incomeCount._sum.amount ?? 0,
+        };
+      } catch (error) {
+        console.error("Error in getanalytics:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch analytics data.",
+        });
+      }
+    })
+  
 });
