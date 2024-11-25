@@ -11,9 +11,12 @@ export const expenseRouter = createTRPCRouter({
    */
   all: publicProcedure.input(z.object({
     userId: z.string(),
-  })).query(async ({ ctx }) => {
+  })).query(async ({ input,ctx }) => {
     try {
       const expenses = await ctx.db.expense.findMany({
+        where: {
+          userId:input.userId,
+        },
       });
       return {
         message: "Expenses fetched successfully.",
