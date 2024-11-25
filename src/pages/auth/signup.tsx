@@ -115,13 +115,6 @@ export default function Signup() {
                     />
                     </div>
 
-                    {/* Forgot Password Link */}
-                    <div className="w-full flex items-center justify-end">
-                    <Link href="/auth/forgot-password" className="font-medium text-lg text-blue-600 hover:text-blue-700">
-                        Forgot password?
-                    </Link>
-                    </div>
-
                     {/* Submit Button */}
                     <Button
                     title="Signup"
