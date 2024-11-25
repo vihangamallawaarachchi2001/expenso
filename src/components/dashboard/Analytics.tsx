@@ -34,12 +34,12 @@ export default function Analytics({ userId }: AnalyticsProps) {
       {analytics ? (
         <div className="space-y-4">
           <div className="flex justify-between">
-            <span className="font-medium text-gray-700">Total Expenses:</span>
-            <span className="font-semibold text-red-600">{analytics.expenseCount}</span>
+            <span className="font-medium text-gray-700">Total Income:</span>
+            <span className="font-semibold text-green-600">{analytics.expenseCount}</span>
           </div>
           <div className="flex justify-between">
-            <span className="font-medium text-gray-700">Total Income:</span>
-            <span className="font-semibold text-green-600">{analytics.incomeCount}</span>
+            <span className="font-medium text-gray-700">Total Expense:</span>
+            <span className="font-semibold text-red-600">{analytics.incomeCount}</span>
           </div>
         </div>
       ) : (
